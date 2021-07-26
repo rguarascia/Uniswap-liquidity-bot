@@ -61,16 +61,19 @@ def getPoolAPI(token, id, pool):
 
     body = json.loads(response.text)
 
-    if (pool == "ETH"):
-        pool = "WETH"
-
     filtered = list(filter(lambda x: x["token1"]['symbol']
                            == pool, body['data']['pool']))
 
     if(not filtered):
+        if (pool == "ETH"):
+            pool = "WETH"
+            filtered = list(filter(lambda x: x["token1"]['symbol']
+                                   == pool, body['data']['pool']))
+
+    if(not filtered):
         return False
 
-    filtered = sorted(filtered, key=lambda k: k.get(
-        'totalValueLockedUSD', 0))
+    filtered = sorted(filtered, key=lambda k: float(k.get(
+        'totalValueLockedUSD', 0)), reverse=True)
 
     return filtered

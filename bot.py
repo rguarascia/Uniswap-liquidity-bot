@@ -35,11 +35,11 @@ def getTokens(update, context):
 
     if (' ' in user_text) or (not '/' in user_text):
         update.message.reply_text(
-            "Use a slash `/` to declare pairs. Ex. `/liq CEL/ETH`")
+            "Use a slash <pre>/</pre> to declare pairs. Ex. <code>/liq CEL/ETH</code>", parse_mode='HTML')
         return
 
-    requestedToken = user_text.split("/")[0]
-    requestedPool = user_text.split("/")[1]
+    requestedToken = user_text.split("/")[0].upper()
+    requestedPool = user_text.split("/")[1].upper()
 
     tokenAPI_reply = getTokenAPI(requestedToken)
     if(not tokenAPI_reply):
@@ -53,18 +53,17 @@ def getTokens(update, context):
 
     if (not poolAPI_reply):
         update.message.reply_text("Pool not found")
+    logger.info(poolAPI_reply)
 
     poolAPI_reply = poolAPI_reply[0]
-
-    logger.info(poolAPI_reply)
 
     short_id = "{}...{}".format(
         poolAPI_reply['id'][0:4], poolAPI_reply['id'][-4:])
 
-    update.message.reply_text("Uniswap Liquidation for {} \n$ {:,}\nFee Tier: {}%\n[{}]({})".format(
+    update.message.reply_text("Uniswap Liquidation for {} \n$ {:,}\nFee Tier: {}%\n<a href='{}'>{}</a>".format(
         user_text, round(float(
-            poolAPI_reply['totalValueLockedUSD']), 2), round(int(poolAPI_reply['feeTier'])/100000, 2), short_id,
-        "https://info.uniswap.org/#/pools/{}".format(poolAPI_reply["id"])))
+            poolAPI_reply['totalValueLockedUSD']), 2), round(int(poolAPI_reply['feeTier'])/10000, 2),
+        "https://info.uniswap.org/#/pools/{}".format(poolAPI_reply["id"]), short_id), parse_mode='HTML')
 
 
 def error(update, context):
