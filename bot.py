@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 help_text = "Use a slash <pre>/</pre> to declare pairs. Ex. <code>/liq CEL/ETH</code>"
 
+PORT = int(os.environ.get('PORT', 5000))
+
 
 def start(update, context):
     """Send a message when the command /start is issued."""
@@ -88,7 +90,12 @@ def main():
     dp.add_error_handler(error)
 
     # Start the Bot
-    updater.start_polling()
+    # updater.start_polling()
+
+    updater.start_webhook(listen="0.0.0.0",
+                          port=int(PORT),
+                          url_path=TOKEN)
+    updater.bot.setWebhook('https://uniswap-liquid-bot.herokuapp.com/' + TOKEN)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
