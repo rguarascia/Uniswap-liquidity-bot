@@ -94,8 +94,8 @@ def main():
 
     updater.start_webhook(listen="0.0.0.0",
                           port=int(PORT),
-                          url_path=TOKEN)
-    updater.bot.setWebhook('https://uniswap-liquid-bot.herokuapp.com/' + TOKEN)
+                          url_path=bot_key)
+    updater.bot.setWebhook('https://uniswap-liquid-bot.herokuapp.com/' + bot_key)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
