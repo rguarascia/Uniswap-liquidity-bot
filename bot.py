@@ -2,6 +2,7 @@
 
 import logging
 from api_endpoints import getTokenAPI, getPoolAPI
+import os
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -71,8 +72,11 @@ def error(update, context):
 
 
 def main():
+    bot_key = os.environ.get('BOTTOKEN')
+    if(not bot_key):
+        return
     updater = Updater(
-        "", use_context=True)
+        bot_key, use_context=True)
 
     dp = updater.dispatcher
 
