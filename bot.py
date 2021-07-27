@@ -1,12 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# This program is dedicated to the public domain under the CC0 license.
 
 import logging
-import requests
-import json
 from api_endpoints import getTokenAPI, getPoolAPI
-
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -16,17 +11,17 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
+help_text = "Use a slash <pre>/</pre> to declare pairs. Ex. <code>/liq CEL/ETH</code>"
 
-# Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
+
 def start(update, context):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    update.message.reply_text('Liquidation bot online.')
 
 
 def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text(help_text, parse_mode="HTML")
 
 
 def getTokens(update, context):
@@ -34,8 +29,7 @@ def getTokens(update, context):
     user_text = update.message.text[4:].strip()
 
     if (' ' in user_text) or (not '/' in user_text):
-        update.message.reply_text(
-            "Use a slash <pre>/</pre> to declare pairs. Ex. <code>/liq CEL/ETH</code>", parse_mode='HTML')
+        update.message.reply_text(help_text, parse_mode='HTML')
         return
 
     requestedToken = user_text.split("/")[0].upper()
@@ -53,6 +47,7 @@ def getTokens(update, context):
 
     if (not poolAPI_reply):
         update.message.reply_text("Pool not found")
+
     logger.info(poolAPI_reply)
 
     poolAPI_reply = poolAPI_reply[0]
@@ -60,10 +55,14 @@ def getTokens(update, context):
     short_id = "{}...{}".format(
         poolAPI_reply['id'][0:4], poolAPI_reply['id'][-4:])
 
-    update.message.reply_text("Uniswap Liquidation for {} \n$ {:,}\nFee Tier: {}%\n<a href='{}'>{}</a>".format(
-        user_text, round(float(
-            poolAPI_reply['totalValueLockedUSD']), 2), round(int(poolAPI_reply['feeTier'])/10000, 2),
-        "https://info.uniswap.org/#/pools/{}".format(poolAPI_reply["id"]), short_id), parse_mode='HTML')
+    update.message.reply_text("Uniswap Liquidation for {} \nTVL: ${:,}\nFee Tier: {}%\n<a href='{}'>{}</a>".format(
+        user_text,
+        round(float(
+            poolAPI_reply['totalValueLockedUSD']), 2),
+        round(int(poolAPI_reply['feeTier'])/10000, 2),
+        "https://info.uniswap.org/#/pools/{}".format(poolAPI_reply["id"]),
+        short_id),
+        parse_mode='HTML')
 
 
 def error(update, context):
